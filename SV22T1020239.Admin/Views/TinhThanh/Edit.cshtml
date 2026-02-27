@@ -1,0 +1,94 @@
+﻿@model TinhThanh
+@{
+    // Logic xác định là Sửa hay Thêm mới dựa vào việc đã có Tên tỉnh hay chưa (hoặc check ID > 0 nếu ID luôn dương)
+    bool isEdit = !string.IsNullOrEmpty(Model.TenTinh);
+    ViewData["Title"] = isEdit ? "Cập nhật tỉnh thành" : "Thêm tỉnh thành mới";
+}
+
+<div class="container-fluid p-0">
+    <div class="mb-3">
+        <h3 class="d-inline-block"><strong>@(isEdit ? "Cập nhật" : "Thêm mới")</strong> Tỉnh Thành</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Danh sách</a></li>
+                <li class="breadcrumb-item active">@ViewData["Title"]</li>
+            </ol>
+        </nav>
+    </div>
+
+    <form asp-action="@(isEdit ? "Edit" : "Create")">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="MaTinh" />
+        }
+
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Thông tin địa phương</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="MaTinh" class="form-label fw-bold">Mã Tỉnh (ID) <span class="text-danger">*</span></label>
+                                @if (isEdit)
+                                {
+                                    <input value="@Model.MaTinh" class="form-control bg-light" readonly />
+                                    <div class="form-text">Mã định danh không thể thay đổi.</div>
+                                }
+                                else
+                                {
+                                    <input asp-for="MaTinh" class="form-control" type="number" placeholder="VD: 1, 2..." required />
+                                    <div class="form-text">Nhập mã số duy nhất (VD: Mã bưu chính hoặc số thứ tự).</div>
+                                    <span asp-validation-for="MaTinh" class="text-danger"></span>
+                                }
+                            </div>
+
+                            <div class="col-md-8 mb-3">
+                                <label asp-for="TenTinh" class="form-label fw-bold">Tên Tỉnh / Thành Phố <span class="text-danger">*</span></label>
+                                <input asp-for="TenTinh" class="form-control" placeholder="VD: Hà Nội, TP. Hồ Chí Minh..." />
+                                <span asp-validation-for="TenTinh" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Tác vụ</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> @(isEdit ? "Lưu thay đổi" : "Tạo mới")
+                            </button>
+                            <a asp-action="Index" class="btn btn-light btn-lg">
+                                Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mt-3 bg-light">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-lightbulb"></i> Gợi ý</h6>
+                        <p class="small text-muted mb-0">
+                            Bạn nên sử dụng tên chuẩn hóa theo hành chính nhà nước để thuận tiện cho việc vận chuyển đơn hàng.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

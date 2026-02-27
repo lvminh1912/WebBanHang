@@ -1,0 +1,143 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-cover {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); /* Màu xanh chủ đạo của Admin */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-form-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+        }
+
+        .btn-primary {
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        .form-control {
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+
+            .form-control:focus {
+                background-color: #fff;
+                box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+            }
+
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+        }
+
+        .feature-list i {
+            font-size: 1.2rem;
+            margin-right: 10px;
+            color: #8bb9fe;
+        }
+
+        .feature-list li {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid g-0">
+        <div class="row g-0">
+            <div class="col-lg-6 d-none d-lg-block login-cover">
+                <div class="text-center px-5">
+                    <div class="logo-text"><i class="bi bi-box-seam"></i> Rau, Củ, Quả </div>
+                    <p class="lead mb-5">Hệ thống quản lý trang cửa hàng bán thực phẩm.</p>
+
+                    <ul class="list-unstyled text-start feature-list d-inline-block">
+                        <li><i class="bi bi-check-circle-fill"></i> Quản lý gần mọi chức năng</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Thống kê doanh thu (i dont think so)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-lg-6 login-form-container">
+                <div class="form-wrapper">
+                    <div class="mb-5">
+                        <h2 class="fw-bold text-dark">Chào mừng trở lại! 👋</h2>
+                        <p class="text-muted">Vui lòng đăng nhập để tiếp tục quản lý.</p>
+                    </div>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>@ViewBag.Error</div>
+                        </div>
+                    }
+
+                    <form asp-action="Login" method="post">
+                        <div class="form-floating mb-3">
+                            <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com" required>
+                            <label for="floatingInput">Địa chỉ Email</label>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+                            <label for="floatingPassword">Mật khẩu</label>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
+                            </div>
+                            <a href="#" class="text-decoration-none small text-primary fw-bold">Quên mật khẩu?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-4 shadow-sm">
+                            Đăng nhập hệ thống
+                        </button>
+
+                        <div class="text-center text-muted">
+                            Chưa có tài khoản quản trị?
+                            <a href="/TaiKhoan/Register" class="text-decoration-none fw-bold">Đăng ký ngay</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

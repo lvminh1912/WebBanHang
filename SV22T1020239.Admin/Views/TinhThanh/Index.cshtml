@@ -1,0 +1,93 @@
+﻿@model PaginatedList<TinhThanh>
+@{
+    ViewData["Title"] = "Quản lý tỉnh thành";
+}
+
+<div class="container-fluid p-0">
+    <div class="row mb-2 mb-xl-3">
+        <div class="col-auto d-none d-sm-block">
+            <h3 class="d-inline-block"><strong>Quản lý Tỉnh Thành</strong></h3>
+        </div>
+        <div class="col-auto ms-auto text-end mt-n1">
+            <a asp-action="Create" class="btn btn-success shadow-sm">
+                <i class="bi bi-plus-lg"></i> Thêm tỉnh thành
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">Bộ lọc tìm kiếm</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="get" id="searchForm">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Tên tỉnh / thành phố</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-geo-alt"></i></span>
+                            <input type="text" name="keyword" value="@ViewBag.SearchModel?.Keyword" class="form-control" placeholder="Nhập tên tỉnh thành cần tìm...">
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body p-0">
+            <div id="data-container">
+                <partial name="List" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.loadPage = function(page) {
+            let data = {
+                page: page,
+                keyword: $('input[name="keyword"]').val()
+            };
+
+            $.ajax({
+                url: '@Url.Action("Index", "TinhThanh")',
+                type: 'GET',
+                data: data,
+                success: function(result) {
+                    $('#data-container').html(result);
+                    $('html, body').animate({ scrollTop: $("#data-container").offset().top - 150 }, 200);
+                },
+                error: function() { alert("Lỗi tải dữ liệu."); }
+            });
+        }
+
+        $('form').submit(function(e) {
+            e.preventDefault();
+            loadPage(1);
+        });
+
+        window.confirmDelete = function(id, name) {
+            if (confirm(`Bạn có chắc muốn xóa "${name}"? Lưu ý: Không thể xóa nếu đã có khách hàng hoặc đơn hàng thuộc tỉnh này.`)) {
+                $.ajax({
+                    url: '@Url.Action("Delete", "TinhThanh")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function(res) {
+                        if(res.success) {
+                            loadPage(1);
+                        } else {
+                            alert(res.message);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

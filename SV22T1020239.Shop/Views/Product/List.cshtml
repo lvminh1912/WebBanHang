@@ -1,0 +1,68 @@
+﻿@model PaginatedList<MatHang>
+
+<div class="row">
+    @if (Model != null && Model.Items.Any())
+    {
+        foreach (var item in Model.Items)
+        {
+            <div class="col-6 col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="position-relative overflow-hidden">
+                        <a href="/Product/Detail/@item.MaMatHang">
+                            <img src="/images/MatHang/@item.HinhAnh" class="card-img-top object-fit-cover" 
+                                 style="height: 200px;" alt="@item.TenMatHang"
+                                 onerror="this.src='/images/no-image.png'">
+                        </a>
+                        @if (item.GiaBan < 100000) // Ví dụ logic hiển thị Sale
+                        {
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2">-10%</span>
+                        }
+                    </div>
+                    <div class="card-body text-center d-flex flex-column">
+                        <h6 class="card-title mb-1">
+                            <a href="/Product/Detail/@item.MaMatHang" class="text-decoration-none text-dark">@item.TenMatHang</a>
+                        </h6>
+                        <div class="mt-auto">
+                            <p class="text-primary fw-bold mb-2">@item.GiaBan.ToString("N0") ₫</p>
+                            <button onclick="addToCart(@item.MaMatHang)" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="bi bi-cart-plus"></i> Thêm giỏ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">Không tìm thấy sản phẩm nào phù hợp.</p>
+        </div>
+    }
+</div>
+
+@* --- PHÂN TRANG (AJAX) --- *@
+@if (Model != null && Model.TotalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            @* Nút Previous *@
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" href="javascript:;" onclick="doSearch(@(Model.PageIndex - 1))">❮</a>
+            </li>
+
+            @* Các trang số *@
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link" href="javascript:;" onclick="doSearch(@i)">@i</a>
+                </li>
+            }
+
+            @* Nút Next *@
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link" href="javascript:;" onclick="doSearch(@(Model.PageIndex + 1))">❯</a>
+            </li>
+        </ul>
+    </nav>
+}

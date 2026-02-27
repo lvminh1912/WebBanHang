@@ -1,0 +1,60 @@
+﻿<nav id="sidebar" class="sidebar js-sidebar">
+    <div class="sidebar-content js-simplebar">
+        <a class="sidebar-brand" href="/">
+            <span class="align-middle"><i class="bi bi-box-seam"></i> Admin HCM</span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li class="sidebar-header">
+                Tổng quan
+            </li>
+            <li class="sidebar-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+                <a class="sidebar-link" asp-controller="Home" asp-action="Index">
+                    <i class="align-middle bi bi-speedometer2"></i> <span class="align-middle">Dashboard</span>
+                </a>
+            </li>
+
+            <li class="sidebar-header">
+                Quản lý bán hàng
+            </li>
+            <li class="sidebar-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "DonHang" ? "active" : "")">
+                <a class="sidebar-link" asp-controller="DonHang" asp-action="Index">
+                    <i class="align-middle bi bi-cart3"></i> <span class="align-middle">Đơn hàng</span>
+                </a>
+            </li>
+            <li class="sidebar-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "KhachHang" ? "active" : "")">
+                <a class="sidebar-link" asp-controller="KhachHang" asp-action="Index">
+                    <i class="align-middle bi bi-people"></i> <span class="align-middle">Khách hàng</span>
+                </a>
+            </li>
+
+            <li class="sidebar-header">
+                Kho & Sản phẩm
+            </li>
+            <li class="sidebar-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "MatHang" ? "active" : "")">
+                <a class="sidebar-link" asp-controller="MatHang" asp-action="Index">
+                    <i class="align-middle bi bi-box"></i> <span class="align-middle">Mặt hàng</span>
+                </a>
+            </li>
+            <li class="sidebar-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "LoaiHang" ? "active" : "")">
+                <a class="sidebar-link" asp-controller="LoaiHang" asp-action="Index">
+                    <i class="align-middle bi bi-tags"></i> <span class="align-middle">Loại hàng</span>
+                </a>
+            </li>
+
+            <li class="sidebar-header">
+                Cấu hình
+            </li>
+            <li class="sidebar-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "TinhThanh" ? "active" : "")">
+                <a class="sidebar-link" asp-controller="TinhThanh" asp-action="Index">
+                    <i class="align-middle bi bi-geo-alt"></i> <span class="align-middle">Tỉnh thành</span>
+                </a>
+            </li>
+            <li class="sidebar-item @(ViewContext.RouteData.Values["Controller"]?.ToString() == "TrangThaiDon" ? "active" : "")">
+                <a class="sidebar-link" asp-controller="TrangThaiDon" asp-action="Index">
+                    <i class="align-middle bi bi-stoplights"></i> <span class="align-middle">Trạng thái đơn</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

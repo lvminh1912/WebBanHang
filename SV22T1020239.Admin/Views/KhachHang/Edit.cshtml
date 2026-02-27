@@ -1,0 +1,155 @@
+﻿@model KhachHang
+@{
+    bool isEdit = Model.MaKhachHang > 0;
+    ViewData["Title"] = isEdit ? "Sửa thông tin khách" : "Thêm khách hàng";
+}
+
+<div class="container-fluid p-0">
+    <div class="mb-3">
+        <h3 class="d-inline-block"><strong>@(isEdit ? "Cập nhật" : "Thêm mới")</strong> Khách hàng</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Khách hàng</a></li>
+                <li class="breadcrumb-item active">@ViewData["Title"]</li>
+            </ol>
+        </nav>
+    </div>
+
+    <form asp-action="@(isEdit ? "Edit" : "Create")" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="MaKhachHang" />
+
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Thông tin cá nhân</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HoTen" class="form-label fw-bold">Họ và Tên <span class="text-danger">*</span></label>
+                                <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên đầy đủ..." />
+                                <span asp-validation-for="HoTen" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DienThoai" class="form-label fw-bold">Số điện thoại</label>
+                                <input asp-for="DienThoai" class="form-control" placeholder="09xxxx..." />
+                                <span asp-validation-for="DienThoai" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label fw-bold">Email đăng nhập <span class="text-danger">*</span></label>
+                                <input asp-for="Email" class="form-control" type="email" placeholder="name@example.com" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MatKhau" class="form-label fw-bold">Mật khẩu</label>
+                                <input asp-for="MatKhau" class="form-control" type="text" placeholder="@(isEdit ? "Để trống nếu không đổi..." : "Nhập mật khẩu...")" />
+                                <span asp-validation-for="MatKhau" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Địa chỉ & Liên hệ</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label asp-for="DiaChi" class="form-label fw-bold">Địa chỉ cụ thể</label>
+                                <input asp-for="DiaChi" class="form-control" placeholder="Số nhà, đường, phường/xã..." />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="MaTinh" class="form-label fw-bold">Tỉnh / Thành phố</label>
+                                <select asp-for="MaTinh" class="form-select" asp-items="ViewBag.MaTinh">
+                                    <option value="">-- Chọn Tỉnh/Thành --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Ảnh đại diện</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <div class="position-relative d-inline-block rounded-circle overflow-hidden border shadow-sm" style="width: 150px; height: 150px;">
+                                <img id="imagePreview"
+                                     src="@(string.IsNullOrEmpty(Model.HinhAnh) ? "/images/no-image.png" : Model.HinhAnh)"
+                                     class="w-100 h-100"
+                                     style="object-fit: cover;" />
+                            </div>
+                        </div>
+                        <input type="file" name="uploadImage" id="uploadImage" class="form-control form-control-sm" accept="image/*" />
+                        <input type="hidden" asp-for="HinhAnh" />
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Thiết lập tài khoản</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="VaiTro" class="form-label fw-bold">Vai trò hệ thống</label>
+                            <select asp-for="VaiTro" class="form-select">
+                                <option value="user">Người dùng (User)</option>
+                                <option value="admin">Quản trị viên (Admin)</option>
+                            </select>
+                            <div class="form-text">Admin có quyền truy cập trang quản trị này.</div>
+                        </div>
+
+                        <hr />
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="DangHoatDong" id="chkActive">
+                            <label class="form-check-label fw-bold" for="chkActive">Đang hoạt động</label>
+                            <p class="text-muted small mb-0">Tắt để khóa tài khoản này tạm thời.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-3">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> @(isEdit ? "Cập nhật" : "Thêm mới")
+                            </button>
+                            <a asp-action="Index" class="btn btn-light btn-lg">
+                                Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Preview ảnh khi chọn
+            $('#uploadImage').change(function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = ev => $('#imagePreview').attr('src', ev.target.result);
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
+}

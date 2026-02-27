@@ -1,0 +1,77 @@
+﻿@model OrderCreateViewModel
+@{
+    ViewData["Title"] = "Xác nhận đặt hàng";
+    var listTinh = ViewBag.ListTinhThanh as List<Models.TinhThanh>;
+}
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">Thông tin đặt hàng</h2>
+
+    <form asp-action="Create" method="post">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card p-4 shadow-sm">
+                    <h4 class="mb-3">Địa chỉ nhận hàng</h4>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3 row">
+                        <div class="col-6">
+                            <label class="form-label text-muted">Người nhận</label>
+                            <input value="@Model.TenKhachHang" class="form-control bg-light" readonly />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted">Số điện thoại</label>
+                            <input value="@Model.SoDienThoai" class="form-control bg-light" readonly />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Địa chỉ chi tiết <span class="text-danger">*</span></label>
+                        <input asp-for="DiaChiGiaoHang" class="form-control" placeholder="Số nhà, đường, phường/xã..." required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tỉnh / Thành phố</label>
+                        <select asp-for="MaTinh" class="form-select" required>
+                            <option value="">-- Chọn Tỉnh Thành --</option>
+                            @if (listTinh != null)
+                            {
+                                foreach (var t in listTinh)
+                                {
+                                    <option value="@t.MaTinh">@t.TenTinh</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card p-4 shadow-sm bg-light">
+                    <h4 class="mb-3">Đơn hàng của bạn</h4>
+                    <ul class="list-group list-group-flush mb-3">
+                        @foreach (var item in Model.Items)
+                        {
+                            <li class="list-group-item d-flex justify-content-between lh-sm bg-transparent">
+                                <div>
+                                    <h6 class="my-0">@item.MatHang?.TenMatHang</h6>
+                                    <small class="text-muted">SL: @item.SoLuong</small>
+                                </div>
+                                <span class="text-muted">@((item.SoLuong * (item.MatHang?.GiaBan ?? 0)).ToString("N0")) đ</span>
+                            </li>
+                        }
+                        <li class="list-group-item d-flex justify-content-between bg-transparent fw-bold mt-2">
+                            <span>Tổng cộng (VND)</span>
+                            <span class="text-danger">@Model.TongTien.ToString("N0") đ</span>
+                        </li>
+                    </ul>
+
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">
+                        Xác nhận đặt hàng
+                    </button>
+                    <a href="/Cart" class="btn btn-link w-100 mt-2">Quay lại giỏ hàng</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

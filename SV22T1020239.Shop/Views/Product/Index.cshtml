@@ -1,0 +1,188 @@
+﻿@model MatHangSearchModel
+@{
+    ViewData["Title"] = "Cửa hàng";
+    var loaiHangs = ViewBag.LoaiHangs as List<Models.LoaiHang> ?? new List<Models.LoaiHang>();
+}
+
+<section class="py-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 d-flex flex-column">
+
+                <div class="sidebar-filter mt-2 p-4 bg-white rounded shadow-sm h-100 border">
+                    <form id="frmSearch" action="~/Product/List" method="get">
+                        <input type="hidden" name="Page" id="Page" value="@Model.Page" />
+                        <input type="hidden" name="PageSize" value="@Model.PageSize" />
+
+                        @* 1. Tìm kiếm Tên *@
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-2">Tên sản phẩm</h6>
+                            <div class="input-group">
+                                <input type="text" name="SearchName" value="@Model.SearchName" class="form-control" placeholder="Nhập tên...">
+                                <button class="btn btn-primary" type="button" onclick="doSearch(1)">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        @* 2. Lọc Loại hàng *@
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-2">Danh mục</h6>
+                            <select class="form-select" name="MaLoai" onchange="doSearch(1)">
+                                <option value="0">-- Tất cả --</option>
+                                @foreach (var lh in loaiHangs)
+                                {
+                                    if (Model.MaLoai == lh.MaLoaiHang)
+                                    {
+                                        <option value="@lh.MaLoaiHang" selected>@lh.TenLoaiHang</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@lh.MaLoaiHang">@lh.TenLoaiHang</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        @* 3. Lọc Khoảng giá *@
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-2">Khoảng giá (VNĐ)</h6>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="text" name="GiaMin"
+                                           value="@(Model.GiaMin > 0 ? Model.GiaMin?.ToString("N0").Replace(",", ".") : "")"
+                                           class="form-control form-control-sm number-separator"
+                                           placeholder="Từ..." maxlength="15">
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" name="GiaMax"
+                                           value="@(Model.GiaMax > 0 ? Model.GiaMax?.ToString("N0").Replace(",", ".") : "")"
+                                           class="form-control form-control-sm number-separator"
+                                           placeholder="Đến..." maxlength="15">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm w-100 mt-3" onclick="doSearch(1)">
+                                <i class="bi bi-funnel"></i> Áp dụng giá
+                            </button>
+                        </div>
+
+                        @* Nút Reset *@
+                        <div class="d-grid mt-auto">
+                            <a href="javascript:;" onclick="clearFilters()" class="btn btn-link text-decoration-none text-muted small">
+                                <i class="bi bi-arrow-counterclockwise"></i> Xóa bộ lọc
+                            </a>
+                        </div>
+
+                        @* Banner quảng cáo nhỏ *@
+                        <div class="card border-0 rounded-4 overflow-hidden shadow-sm">
+                            <img src="~/images/ad-image-1.png" class="img-fluid" alt="Ad">
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            @* --- KẾT QUẢ TÌM KIẾM --- *@
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm border">
+                    <h4 class="fw-bold mb-0 text-primary">Danh sách sản phẩm</h4>
+                    <select class="form-select w-auto border-0 bg-light fw-bold" name="SortOrder" form="frmSearch" onchange="doSearch(1)">
+                        <!option value="" @(Model.SortOrder == "" ? "selected" : "")>Mặc định</!option>
+                        <!option value="price_asc" @(Model.SortOrder == "price_asc" ? "selected" : "")>Giá tăng dần</!option>
+                        <!option value="price_desc" @(Model.SortOrder == "price_desc" ? "selected" : "")>Giá giảm dần</!option>
+                        <!option value="name_asc" @(Model.SortOrder == "name_asc" ? "selected" : "")>Tên: A-Z</!option>
+                        <!option value="name_desc" @(Model.SortOrder == "name_desc" ? "selected" : "")>Tên: Z-A</!option>
+                    </select>
+                </div>
+
+                <div id="searchResult">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 1. Load dữ liệu ban đầu
+            doSearch(@Model.Page);
+
+            // 2. Xử lý nhập tiền: Tự động thêm dấu chấm phân cách hàng nghìn
+            $(document).on('input', '.number-separator', function(e) {
+                // Xóa các ký tự không phải số
+                let value = $(this).val().replace(/[^0-9]/g, '');
+
+                // Nếu có giá trị thì format
+                if (value) {
+                    // Dùng Intl để format chuẩn VN (dấu chấm)
+                    value = new Intl.NumberFormat('vi-VN').format(parseInt(value));
+                }
+
+                $(this).val(value);
+            });
+        });
+
+        function doSearch(page) {
+            var url = $("#frmSearch").prop("action");
+
+            // Lấy dữ liệu từ form
+            var postData = $("#frmSearch").serializeArray();
+
+            // 3. XỬ LÝ QUAN TRỌNG: Loại bỏ dấu chấm trong GiaMin, GiaMax trước khi gửi đi
+            postData.forEach(function(item) {
+                if (item.name === "GiaMin" || item.name === "GiaMax") {
+                    // Thay thế tất cả dấu chấm bằng rỗng
+                    item.value = item.value.split('.').join('');
+                }
+            });
+
+            // Cập nhật Page
+            var pageParam = postData.find(x => x.name === "Page");
+            if(pageParam) pageParam.value = page;
+            else postData.push({ name: "Page", value: page });
+
+            // Gửi AJAX
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: postData,
+                success: function (data) {
+                    $("#searchResult").html(data);
+                    $("#Page").val(page);
+                },
+                error: function () {
+                    alert("Lỗi tải dữ liệu. Vui lòng thử lại.");
+                }
+            });
+        }
+
+        function addToCart(id) {
+            // Hiện tại hàm này sẽ chuyển hướng sang trang giỏ hàng ngay lập tức
+            window.location.href = "/Cart/Add/" + id;
+        }
+
+        function clearFilters() {
+            // 1. Reset toàn bộ form về giá trị mặc định của HTML
+            document.getElementById("frmSearch").reset();
+
+            // 2. Xóa thủ công các giá trị input 
+            $("#frmSearch input[type='text'], #frmSearch input[type='number']").val("");
+            $("#frmSearch select").val("0");
+
+            // 3. Quan trọng: Gọi lại hàm tìm kiếm với trang 1.
+            doSearch(1);
+        }
+
+        // Ngăn Enter submit form mặc định
+        $("#frmSearch").submit(function(e) {
+            e.preventDefault();
+            doSearch(1);
+        });
+    </script>
+}

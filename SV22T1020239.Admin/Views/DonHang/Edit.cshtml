@@ -1,0 +1,299 @@
+﻿@model DonHang
+@{
+    bool isEdit = Model.MaDonHang > 0;
+    ViewData["Title"] = isEdit ? $"Sửa đơn hàng #{Model.MaDonHang}" : "Tạo đơn hàng mới";
+}
+
+<div class="container-fluid p-0">
+    <div class="mb-3">
+        <h3 class="d-inline-block"><strong>@(isEdit ? "Chỉnh sửa" : "Tạo mới")</strong> Đơn hàng</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Đơn hàng</a></li>
+                <li class="breadcrumb-item active">@ViewData["Title"]</li>
+            </ol>
+        </nav>
+    </div>
+
+    <form asp-action="@(isEdit ? "Edit" : "Create")" id="formDonHang">
+        <input type="hidden" asp-for="MaDonHang" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row">
+            <div class="col-12 col-lg-8">
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0"><i class="bi bi-person-bounding-box me-2"></i>Thông tin khách hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-0">
+                            <label class="form-label fw-bold">Tìm khách hàng <span class="text-danger">*</span></label>
+                            <select asp-for="MaKhachHang" class="form-select" id="selectKhachHang">
+                                @if (Model.MaKhachHang > 0 && Model.KhachHang != null)
+                                {
+                                    <option value="@Model.MaKhachHang" selected>
+                                        @Model.KhachHang.HoTen - @Model.KhachHang.DienThoai
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="MaKhachHang" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0"><i class="bi bi-cart3 me-2"></i>Chi tiết đơn hàng</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="bg-light p-3 border-bottom">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="form-label small text-muted text-uppercase fw-bold">Sản phẩm</label>
+                                    <select id="selectSanPham" class="form-select">
+                                        <option value="">-- Nhập tên sản phẩm --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted text-uppercase fw-bold">Đơn giá</label>
+                                    <input type="text" id="displayGia" class="form-control bg-white" readonly />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted text-uppercase fw-bold">Số lượng</label>
+                                    <input type="number" id="inputSoLuong" class="form-control" value="1" min="1" />
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="button" class="btn btn-success w-100" onclick="addItem()">
+                                        <i class="bi bi-plus-lg"></i> Thêm vào đơn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="tblChiTiet">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Sản phẩm</th>
+                                        <th class="text-end">Đơn giá</th>
+                                        <th class="text-center">Số lượng</th>
+                                        <th class="text-end">Thành tiền</th>
+                                        <th class="text-center">Xóa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyChiTiet">
+                                    @if (Model.DonHangChiTiets != null && Model.DonHangChiTiets.Count > 0)
+                                    {
+                                        int index = 0;
+                                        foreach (var item in Model.DonHangChiTiets)
+                                        {
+                                            <tr class="item-row">
+                                                <td class="ps-3">
+                                                    <input type="hidden" name="DonHangChiTiets[@index].MaMatHang" value="@item.MaMatHang" class="inp-maloai" />
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="/images/MatHang/@item.MatHang?.HinhAnh" width="40" height="40" class="rounded border me-2" style="object-fit: cover;" onerror="this.src='/images/no-image.png'" />
+                                                        <span class="fw-medium">@item.MatHang?.TenMatHang</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-end">@string.Format("{0:N0}", item.DonGia)</td>
+                                                <td class="text-center">
+                                                    <input type="number" name="DonHangChiTiets[@index].SoLuong" value="@item.SoLuong" class="form-control form-control-sm d-inline-block text-center inp-soluong" style="width: 70px" onchange="updateTotal()" min="1" />
+                                                </td>
+                                                <td class="text-end fw-bold text-dark row-total">@string.Format("{0:N0}", item.DonGia * item.SoLuong)</td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeItem(this)"><i class="bi bi-x-lg"></i></button>
+                                                </td>
+                                                <input type="hidden" class="inp-price" value="@item.DonGia" />
+                                            </tr>
+                                            index++;
+                                        }
+                                    }
+                                </tbody>
+                                <tfoot class="bg-light">
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold text-uppercase text-muted pt-3">Tổng tiền thanh toán:</td>
+                                        <td class="text-end fw-bold text-primary fs-4 pt-3" id="totalAmount">0 đ</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Thiết lập đơn hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Trạng thái</label>
+                            <select asp-for="MaTrangThai" class="form-select" asp-items="@(new SelectList(ViewBag.TrangThais, "MaTrangThai", "TenTrangThai"))"></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ngày tạo đơn</label>
+                            <input asp-for="NgayDat" class="form-control" type="datetime-local" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Địa chỉ giao hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tỉnh / Thành phố</label>
+                            <select asp-for="MaTinh" class="form-select" asp-items="@(new SelectList(ViewBag.TinhThanhs, "MaTinh", "TenTinh"))">
+                                <option value="">-- Chọn Tỉnh/Thành --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Địa chỉ chi tiết</label>
+                            <textarea asp-for="DiaChiGiaoHang" class="form-control" rows="3" placeholder="Số nhà, đường..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-3">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> Lưu đơn hàng
+                            </button>
+                            <a asp-action="Index" class="btn btn-light btn-lg">Hủy bỏ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Select2 Khách hàng
+            $('#selectKhachHang').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Tìm khách hàng...',
+                allowClear: true,
+                ajax: {
+                    url: '@Url.Action("SearchKhachHang", "DonHang")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({ term: params.term }),
+                    processResults: data => ({ results: data.results })
+                }
+            });
+
+            // Select2 Sản phẩm
+            $('#selectSanPham').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Tìm sản phẩm...',
+                allowClear: true,
+                ajax: {
+                    url: '@Url.Action("SearchMatHang", "DonHang")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({ term: params.term }),
+                    processResults: data => ({ results: data.results })
+                }
+            });
+
+            $('#selectSanPham').on('select2:select', function (e) {
+                var data = e.params.data;
+                $(this).attr('data-selected-price', data.price);
+                $(this).attr('data-selected-img', data.image);
+                $(this).attr('data-selected-name', data.text);
+                $('#displayGia').val(new Intl.NumberFormat('vi-VN').format(data.price) + ' đ');
+            });
+
+            updateTotal();
+        });
+
+        function addItem() {
+            var maHang = $('#selectSanPham').val();
+            var tenHang = $('#selectSanPham').attr('data-selected-name');
+            var giaBan = $('#selectSanPham').attr('data-selected-price');
+            var hinhAnh = $('#selectSanPham').attr('data-selected-img');
+            var soLuong = parseInt($('#inputSoLuong').val());
+
+            if (!maHang || soLuong <= 0) {
+                alert("Vui lòng tìm và chọn sản phẩm!");
+                return;
+            }
+
+            var exists = false;
+            $('#tbodyChiTiet tr').each(function() {
+                if ($(this).find('.inp-maloai').val() == maHang) {
+                    var inputSL = $(this).find('.inp-soluong');
+                    inputSL.val(parseInt(inputSL.val()) + soLuong);
+                    exists = true; return false;
+                }
+            });
+
+            if (!exists) {
+                var html = `
+                    <tr class="item-row">
+                        <td class="ps-3">
+                            <input type="hidden" class="inp-maloai" value="${maHang}" />
+                            <input type="hidden" class="inp-price" value="${giaBan}" />
+                            <div class="d-flex align-items-center">
+                                <img src="/images/MatHang/${hinhAnh}" width="40" height="40" class="rounded border me-2" onerror="this.src='/images/no-image.png'" style="object-fit: cover;" />
+                                <span class="fw-medium">${tenHang}</span>
+                            </div>
+                        </td>
+                        <td class="text-end">${new Intl.NumberFormat('vi-VN').format(giaBan)}</td>
+                        <td class="text-center">
+                            <input type="number" value="${soLuong}" class="form-control form-control-sm d-inline-block text-center inp-soluong" style="width: 70px" onchange="updateTotal()" min="1" />
+                        </td>
+                        <td class="text-end fw-bold text-dark row-total"></td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeItem(this)"><i class="bi bi-x-lg"></i></button>
+                        </td>
+                    </tr>`;
+                $('#tbodyChiTiet').append(html);
+            }
+
+            $('#inputSoLuong').val(1);
+            $('#selectSanPham').val(null).trigger('change');
+            $('#displayGia').val('');
+            updateTotal();
+        }
+
+        function removeItem(btn) {
+            $(btn).closest('tr').remove();
+            updateTotal();
+        }
+
+        function updateTotal() {
+            var grandTotal = 0;
+            $('#tbodyChiTiet tr').each(function() {
+                var price = parseFloat($(this).find('.inp-price').val());
+                var qty = parseInt($(this).find('.inp-soluong').val());
+                var total = price * qty;
+                $(this).find('.row-total').text(new Intl.NumberFormat('vi-VN').format(total));
+                grandTotal += total;
+            });
+            $('#totalAmount').text(new Intl.NumberFormat('vi-VN').format(grandTotal) + ' đ');
+        }
+
+        $('#formDonHang').submit(function() {
+            var index = 0;
+            $('#tbodyChiTiet tr').each(function() {
+                $(this).find('.inp-maloai').attr('name', `DonHangChiTiets[${index}].MaMatHang`);
+                $(this).find('.inp-soluong').attr('name', `DonHangChiTiets[${index}].SoLuong`);
+                index++;
+            });
+        });
+    </script>
+}

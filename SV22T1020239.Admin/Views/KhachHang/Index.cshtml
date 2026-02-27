@@ -1,0 +1,106 @@
+﻿@model PaginatedList<KhachHang>
+@{
+    ViewData["Title"] = "Quản lý khách hàng";
+}
+
+<div class="container-fluid p-0">
+    <div class="row mb-2 mb-xl-3">
+        <div class="col-auto d-none d-sm-block">
+            <h3 class="d-inline-block"><strong>Quản lý Khách Hàng</strong></h3>
+        </div>
+        <div class="col-auto ms-auto text-end mt-n1">
+            <a asp-action="Create" class="btn btn-success shadow-sm">
+                <i class="bi bi-person-plus-fill"></i> Thêm khách hàng mới
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">Bộ lọc tìm kiếm</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="get" id="searchForm">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label">Thông tin khách hàng</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                            <input type="text" name="keyword" value="@ViewBag.SearchModel?.Keyword" class="form-control" placeholder="Tìm theo tên, SĐT hoặc Email...">
+                        </div>
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="form-label">Địa chỉ / Khu vực</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-geo-alt"></i></span>
+                            <input type="text" name="diaChi" value="@ViewBag.SearchModel?.DiaChi" class="form-control" placeholder="Nhập địa chỉ cần tìm...">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body p-0">
+            <div id="data-container">
+                <partial name="List" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.loadPage = function(page) {
+            let data = {
+                page: page,
+                keyword: $('input[name="keyword"]').val(),
+                diaChi: $('input[name="diaChi"]').val()
+            };
+
+            $.ajax({
+                url: '@Url.Action("Index", "KhachHang")',
+                type: 'GET',
+                data: data,
+                success: function(result) {
+                    $('#data-container').html(result);
+                    // Cuộn nhẹ lên đầu danh sách
+                    $('html, body').animate({ scrollTop: $("#data-container").offset().top - 150 }, 200);
+                }
+            });
+        }
+
+        $('form').submit(function(e) {
+            e.preventDefault();
+            loadPage(1);
+        });
+
+        window.confirmDelete = function(id, name) {
+            if (confirm(`Bạn có chắc chắn muốn xóa khách hàng "${name}"? Hành động này sẽ xóa cả đơn hàng của họ.`)) {
+                $.ajax({
+                    url: '@Url.Action("Delete", "KhachHang")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function(res) {
+                        if(res.success) {
+                            // Load lại trang hiện tại
+                            let currentPage = parseInt($('.pagination .active .page-link').text()) || 1;
+                            loadPage(currentPage);
+                        } else {
+                            alert(res.message);
+                        }
+                    },
+                    error: function() { alert("Lỗi kết nối server."); }
+                });
+            }
+        }
+    </script>
+}

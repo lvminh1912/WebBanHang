@@ -1,0 +1,101 @@
+﻿@model PaginatedList<DonHang>
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<div class="container-fluid p-0">
+    <div class="row mb-2 mb-xl-3">
+        <div class="col-auto d-none d-sm-block">
+            <h3 class="d-inline-block"><strong>Quản lý Đơn Hàng</strong></h3>
+        </div>
+        <div class="col-auto ms-auto text-end mt-n1">
+            <a asp-action="Create" class="btn btn-success shadow-sm">
+                <i class="bi bi-plus-lg"></i> Tạo đơn mới
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">Bộ lọc & Tìm kiếm</h5>
+        </div>
+        <div class="card-body">
+            <form id="searchForm" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Thông tin đơn</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" name="keyword" value="@ViewBag.SearchModel?.Keyword" class="form-control" placeholder="Mã đơn, Tên khách...">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Trạng thái</label>
+                    <select name="maTrangThai" class="form-select">
+                        <option value="">-- Tất cả --</option>
+                        @foreach (var tt in ViewBag.TrangThais)
+                        {
+                            <option value="@tt.MaTrangThai" selected="@(tt.MaTrangThai == ViewBag.SearchModel?.MaTrangThai)">
+                                @tt.TenTrangThai
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" name="tuNgay" value="@ViewBag.SearchModel?.TuNgay?.ToString("yyyy-MM-dd")" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" name="denNgay" value="@ViewBag.SearchModel?.DenNgay?.ToString("yyyy-MM-dd")" class="form-control">
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel"></i> Lọc dữ liệu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body p-0">
+            <div id="data-container">
+                <partial name="List" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.loadPage = function(page) {
+            let data = {
+                page: page,
+                keyword: $('input[name="keyword"]').val(),
+                maTrangThai: $('select[name="maTrangThai"]').val(),
+                tuNgay: $('input[name="tuNgay"]').val(),
+                denNgay: $('input[name="denNgay"]').val()
+            };
+            $.ajax({
+                url: '@Url.Action("Index", "DonHang")',
+                type: 'GET',
+                data: data,
+                success: function(result) {
+                    $('#data-container').html(result);
+                    $('html, body').animate({ scrollTop: $("#data-container").offset().top - 150 }, 200);
+                },
+                error: function() { alert("Lỗi tải dữ liệu."); }
+            });
+        }
+
+        $(document).ready(function() {
+            $('#searchForm').submit(function(e) {
+                e.preventDefault();
+                loadPage(1);
+            });
+        });
+    </script>
+}

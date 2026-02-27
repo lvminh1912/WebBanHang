@@ -1,0 +1,77 @@
+﻿@model LoaiHang
+@{
+    bool isEdit = Model.MaLoaiHang > 0;
+    ViewData["Title"] = isEdit ? "Cập nhật loại hàng" : "Thêm loại hàng mới";
+}
+
+<div class="container-fluid p-0">
+    <div class="mb-3">
+        <h3 class="d-inline-block"><strong>@(isEdit ? "Cập nhật" : "Thêm mới")</strong> Loại Hàng</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Danh sách</a></li>
+                <li class="breadcrumb-item active">@ViewData["Title"]</li>
+            </ol>
+        </nav>
+    </div>
+
+    <form asp-action="@(isEdit ? "Edit" : "Create")">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="MaLoaiHang" />
+
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Thông tin chi tiết</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="TenLoaiHang" class="form-label fw-bold">Tên loại hàng <span class="text-danger">*</span></label>
+                            <input asp-for="TenLoaiHang" class="form-control form-control-lg" placeholder="VD: Điện thoại, Laptop..." />
+                            <span asp-validation-for="TenLoaiHang" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="MoTa" class="form-label fw-bold">Mô tả</label>
+                            <textarea asp-for="MoTa" class="form-control" rows="5" placeholder="Nhập mô tả cho loại hàng này..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Tác vụ</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> @(isEdit ? "Lưu thay đổi" : "Tạo mới")
+                            </button>
+                            <a asp-action="Index" class="btn btn-light btn-lg">
+                                Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mt-3 bg-light">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-info-circle"></i> Lưu ý</h6>
+                        <p class="small text-muted mb-0">
+                            Tên loại hàng cần ngắn gọn và dễ hiểu. Việc phân loại chính xác giúp khách hàng dễ dàng tìm kiếm sản phẩm hơn.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

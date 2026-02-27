@@ -1,0 +1,77 @@
+﻿@model HeaderViewModel
+
+<header>
+    <div class="container-fluid">
+        <div class="row py-3 border-bottom align-items-center">
+
+            <div class="col-sm-4 col-lg-3 text-center text-sm-start">
+                <div class="main-logo">
+                    <a href="~/">
+                        <img src="~/images/logo.png" alt="logo" class="img-fluid">
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-sm-6 offset-sm-2 offset-md-0 col-lg-5 d-none d-lg-block">
+                <div class="search-bar row bg-light p-2 my-2 rounded-4">
+                    <div class="col-11">
+                        <form id="search-form" class="text-center" action="~/Product/Index" method="get">
+                            <input type="text" name="keyword" class="form-control border-0 bg-transparent" placeholder="Tìm kiếm...">
+                        </form>
+                    </div>
+                    <div class="col-1 text-end">
+                        <i class="bi bi-search"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-8 col-lg-4 d-flex justify-content-end align-items-center gap-3">
+
+                <div class="cart-box me-3">
+                    <a href="#" class="d-flex align-items-center text-decoration-none text-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
+                        <div class="position-relative bg-light rounded-circle p-2">
+                            <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#cart"></use></svg>
+                            @if (Model.CartCount > 0)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem;">
+                                    @Model.CartCount
+                                </span>
+                            }
+                        </div>
+                        <div class="ms-2 d-none d-md-block">
+                            <small class="text-muted d-block" style="font-size: 0.7rem; line-height: 1;">Giỏ hàng</small>
+                            <span class="fw-bold">@Model.CartTotal.ToString("N0") ₫</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="user-box border-start ps-3">
+                    @if (User.Identity!.IsAuthenticated)
+                    {
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="@Model.Avatar" alt="avatar" class="rounded-circle border" style="width: 38px; height: 38px; object-fit: cover;">
+                                <div class="ms-2 d-none d-sm-block">
+                                    <span class="fw-bold d-block" style="font-size: 0.9rem;">@Model.FullName</span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
+                                <li><a class="dropdown-item py-2" href="~/User/Profile"><i class="bi bi-person-circle me-2 text-primary"></i> Thông tin tài khoản</a></li>
+                                <li><a class="dropdown-item py-2" href="~/User/Orders"><i class="bi bi-bag-check me-2 text-success"></i> Đơn hàng của tôi</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 text-danger" href="~/User/Logout"><i class="bi bi-box-arrow-right me-2"></i> Đăng xuất</a></li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex gap-2">
+                            <a href="~/User/Login" class="btn btn-outline-primary btn-sm rounded-pill px-3">Đăng nhập</a>
+                            <a href="~/User/Register" class="btn btn-primary btn-sm rounded-pill px-3">Đăng ký</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

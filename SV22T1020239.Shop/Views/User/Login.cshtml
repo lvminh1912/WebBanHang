@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = "_AuthLayout";
+}
+
+<section class="py-5" style="background: #f9f9f9; min-height: 80vh; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">Chào mừng trở lại!</h2>
+                        <p class="text-muted">Đăng nhập để tiếp tục mua sắm</p>
+                    </div>
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    <form action="~/User/Login" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" name="email" class="form-control bg-light border-0" required>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label fw-bold">Mật khẩu</label>
+                                <a href="#" class="text-primary small text-decoration-none">Quên mật khẩu?</a>
+                            </div>
+                            <input type="password" name="password" class="form-control form-control-lg bg-light border-0" required>
+                        </div>
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label small" for="rememberMe">Ghi nhớ đăng nhập</label>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold text-uppercase mt-3">Đăng nhập</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted">Chưa có tài khoản? <a href="~/User/Register" class="text-decoration-none fw-bold">Đăng ký ngay</a></p>
+                    </div>
+
+                    @* Đăng nhập bằng mạng xã hội (Tùy chọn) *@
+                    <div class="position-relative my-4">
+                        <hr>
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">Hoặc đăng nhập với</span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-light border w-100 py-2 d-flex align-items-center justify-content-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="18" class="me-2"> Google
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

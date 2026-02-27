@@ -1,0 +1,125 @@
+﻿@model KhachHang
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    var listTinh = ViewBag.ListTinhThanh as List<TinhThanh>;
+}
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <partial name="_UserSidebar" />
+            </div>
+
+            <div class="col-lg-9">
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h4 class="mb-4">Thông tin cá nhân</h4>
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i> @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Profile" method="post" enctype="multipart/form-data">
+                        <div class="row mb-4">
+                            <div class="col-md-3 text-center">
+                                <div class="position-relative d-inline-block">
+                                    @* Thêm id="imgPreview" để thay đổi src bằng JS *@
+                                    <img id="imgPreview"
+                                         src="@(string.IsNullOrEmpty(Model.HinhAnh) ? "/images/no-image.png" : Model.HinhAnh)"
+                                         class="img-thumbnail rounded-circle mb-2"
+                                         style="width: 150px; height: 150px; object-fit: cover;">
+
+                                    <div class="mt-2">
+                                        @* Thêm id="uploadPhoto" để bắt sự kiện change *@
+                                        <input type="file" name="uploadPhoto" id="uploadPhoto"
+                                               class="form-control form-control-sm"
+                                               accept="image/*" />
+                                        <small class="text-muted">Định dạng: JPG, PNG, GIF</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-9">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-muted small">Email (Tên đăng nhập)</label>
+                                    <input value="@Model.Email" class="form-control bg-light" readonly />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Họ và tên <span class="text-danger">*</span></label>
+                                    <input asp-for="HoTen" class="form-control" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Số điện thoại</label>
+                                <input asp-for="DienThoai" class="form-control" placeholder="Nhập số điện thoại..." />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tỉnh / Thành phố</label>
+                                <select asp-for="MaTinh" class="form-select">
+                                    <option value="">-- Chọn Tỉnh / Thành --</option>
+                                    @if (listTinh != null)
+                                    {
+                                        foreach (var tinh in listTinh)
+                                        {
+                                            <option value="@tinh.MaTinh">@tinh.TenTinh</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Địa chỉ chi tiết</label>
+                            <input asp-for="DiaChi" class="form-control" placeholder="Số nhà, tên đường, phường/xã..." />
+                        </div>
+
+                        <div class="text-end border-top pt-3">
+                            <button type="submit" class="btn btn-primary px-4 py-2 fw-bold">
+                                <i class="bi bi-save me-2"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            // Lắng nghe sự kiện khi người dùng chọn file
+            $("#uploadPhoto").change(function () {
+                const file = this.files[0];
+                if (file) {
+                    // Kiểm tra xem file có phải là ảnh không
+                    if (file.type.match('image.*')) {
+                        const reader = new FileReader();
+
+                        // Khi file được đọc xong
+                        reader.onload = function (e) {
+                            // Cập nhật thuộc tính src của thẻ img để hiển thị ảnh mới
+                            $('#imgPreview').attr('src', e.target.result);
+                        }
+
+                        // Đọc file dưới dạng URL dữ liệu (base64)
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert("Vui lòng chọn một tệp hình ảnh hợp lệ.");
+                        $(this).val(''); // Xóa file đã chọn nếu không hợp lệ
+                    }
+                }
+            });
+        });
+    </script>
+}

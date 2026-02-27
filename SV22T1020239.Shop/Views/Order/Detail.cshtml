@@ -1,0 +1,191 @@
+﻿@model Models.DonHang
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.MaDonHang;
+    int currentStatus = Model.MaTrangThai ?? 0;
+}
+
+<style>
+    /* Thanh trạng thái đơn hàng (Stepper) */
+    .status-stepper {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 20px 0;
+    }
+
+        .status-stepper::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e9ecef;
+            z-index: 1;
+        }
+
+    .step-item {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        width: 25%;
+    }
+
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        background: #fff;
+        border: 3px solid #e9ecef;
+        border-radius: 50%;
+        line-height: 34px;
+        margin: 0 auto 10px;
+        font-weight: bold;
+        color: #adb5bd;
+        transition: 0.3s;
+    }
+
+    /* Trạng thái đang ở bước này */
+    .step-item.active .step-icon {
+        border-color: #ffc107;
+        color: #ffc107;
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+    }
+    /* Trạng thái đã hoàn thành bước này */
+    .step-item.completed .step-icon {
+        background: #28a745;
+        border-color: #28a745;
+        color: #fff;
+    }
+
+        .step-item.completed .step-icon::after {
+            content: "✓";
+        }
+
+    .step-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #6c757d;
+    }
+
+    .step-item.active .step-label, .step-item.completed .step-label {
+        color: #212529;
+        font-weight: bold;
+    }
+</style>
+
+<section class="py-5">
+    <div class="container-fluid">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    @if (currentStatus == 5)
+                    {
+                        <div class="alert alert-danger d-flex align-items-center mb-0">
+                            <i class="bi bi-x-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <strong>Đơn hàng đã bị hủy</strong><br />
+                                <small>Vào lúc: @Model.NgayHuy?.ToString("HH:mm dd/MM/yyyy")</small>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="status-stepper">
+                            <div class="step-item @(currentStatus >= 1 ? (currentStatus > 1 ? "completed" : "active") : "")">
+                                <div class="step-icon">@(currentStatus > 1 ? "" : "1")</div>
+                                <div class="step-label">Đã đặt hàng</div>
+                            </div>
+                            <div class="step-item @(currentStatus >= 2 ? (currentStatus > 2 ? "completed" : "active") : "")">
+                                <div class="step-icon">@(currentStatus > 2 ? "" : "2")</div>
+                                <div class="step-label">Xác nhận</div>
+                            </div>
+                            <div class="step-item @(currentStatus >= 3 ? (currentStatus > 3 ? "completed" : "active") : "")">
+                                <div class="step-icon">@(currentStatus > 3 ? "" : "3")</div>
+                                <div class="step-label">Đang giao</div>
+                            </div>
+                            <div class="step-item @(currentStatus == 4 ? "completed active" : "")">
+                                <div class="step-icon">@(currentStatus == 4 ? "" : "4")</div>
+                                <div class="step-label">Thành công</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="mb-4">Danh sách sản phẩm</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                @foreach (var item in Model.DonHangChiTiets)
+                                {
+                                    <tr>
+                                        <td style="width: 80px;">
+                                            <img src="@(string.IsNullOrEmpty(item.MatHang?.HinhAnh) ? "/images/no-image.png" : $"/images/MatHang/{item.MatHang.HinhAnh}")" class="rounded-3" style="width:60px; height:60px; object-fit:cover;">
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold">@item.MatHang?.TenMatHang</div>
+                                            <small class="text-muted">Đơn giá: @item.DonGia.ToString("N0") ₫</small>
+                                        </td>
+                                        <td class="text-center">x @item.SoLuong</td>
+                                        <td class="text-end fw-bold">@((item.SoLuong * item.DonGia).ToString("N0")) ₫</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-light">
+                    <h5 class="mb-3">Địa chỉ nhận hàng</h5>
+                    <p class="mb-1 fw-bold">@Model.KhachHang?.HoTen</p>
+                    <p class="mb-1">@Model.KhachHang?.DienThoai</p>
+                    <p class="mb-0 text-muted">@Model.DiaChiGiaoHang, @Model.TinhThanh?.TenTinh</p>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-dark text-white">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tạm tính:</span>
+                        <span>@Model.TongTien?.ToString("N0") ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Phí vận chuyển:</span>
+                        <span class="text-success">Miễn phí</span>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fs-5">Thành tiền:</span>
+                        <span class="fs-3 fw-bold text-warning">@Model.TongTien?.ToString("N0") ₫</span>
+                    </div>
+
+                    @* Kiểm tra nếu đơn hàng chưa thành công và chưa hủy thì cho phép nút Hủy xuất hiện *@
+                    @if (currentStatus != 4 && currentStatus != 5)
+                    {
+                        @if (currentStatus == 3)
+                        {
+                            <p class="text-danger small mt-1 text-center">* Đơn hàng đang được giao, việc hủy có thể phát sinh phí vận chuyển.</p>
+                        }
+                        <form asp-controller="Order" asp-action="Cancel" asp-route-id="@Model.MaDonHang" method="post"
+                              onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">
+                            <button type="submit" class="btn btn-outline-danger w-100 py-3 fw-bold">
+                                <i class="bi bi-trash"></i> HỦY ĐƠN HÀNG
+                            </button>
+                        </form>
+                    }
+
+                    @* Nút mua lại dành cho đơn đã xong hoặc đã hủy *@
+                    @if (currentStatus == 4 || currentStatus == 5)
+                    {
+                        <form asp-controller="Product" asp-action="Index">
+                            <button class="btn btn-warning w-100 py-3 fw-bold text-dark mb-2">
+                                <i class="bi bi-cart-plus"></i> Tiếp tục mua sắm
+                            </button>
+                        </form>
+                    }
+                    <a href="/User/Orders" class="btn btn-outline-light w-100 mt-2">Quay lại danh sách</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,158 @@
+﻿@model MatHang
+@{
+    bool isEdit = Model.MaMatHang > 0;
+    ViewData["Title"] = isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới";
+}
+
+<div class="container-fluid p-0">
+    <div class="mb-3">
+        <h3 class="d-inline-block"><strong>@(isEdit ? "Chỉnh sửa" : "Thêm mới")</strong> Sản phẩm</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Mặt hàng</a></li>
+                <li class="breadcrumb-item active">@ViewData["Title"]</li>
+            </ol>
+        </nav>
+    </div>
+
+    <form asp-action="@(isEdit ? "Edit" : "Create")" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="MaMatHang" />
+
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Thông tin cơ bản</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="TenMatHang" class="form-label fw-bold">Tên mặt hàng <span class="text-danger">*</span></label>
+                            <input asp-for="TenMatHang" class="form-control form-control-lg" placeholder="Nhập tên sản phẩm..." />
+                            <span asp-validation-for="TenMatHang" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaLoaiHang" class="form-label fw-bold">Loại hàng</label>
+                                <select asp-for="MaLoaiHang" class="form-select" asp-items="ViewBag.MaLoaiHang"></select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DonViTinh" class="form-label fw-bold">Đơn vị tính</label>
+                                <input asp-for="DonViTinh" class="form-control" placeholder="VD: Kg, Cái, Bó..." />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Giá bán (VNĐ)</label>
+                                <input asp-for="GiaBan" type="hidden" id="GiaBanReal" />
+                                <input type="text" id="GiaBanDisplay" class="form-control" placeholder="0" autocomplete="off" />
+                                <span asp-validation-for="GiaBan" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SoLuong" class="form-label fw-bold">Số lượng tồn kho</label>
+                                <input asp-for="SoLuong" class="form-control" type="number" min="0" />
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="MoTa" class="form-label fw-bold">Mô tả chi tiết</label>
+                            <textarea asp-for="MoTa" class="form-control" rows="6" placeholder="Nhập thông tin mô tả sản phẩm..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Hình ảnh sản phẩm</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <div class="position-relative d-inline-block">
+                                <img id="imagePreview"
+                                     src="@(string.IsNullOrEmpty(Model.HinhAnh) ? "/images/no-image.png" : "/images/MatHang/" + Model.HinhAnh)"
+                                     class="img-thumbnail shadow-sm"
+                                     style="width: 100%; max-width: 300px; height: auto; min-height: 200px; object-fit: cover;" />
+                            </div>
+                        </div>
+                        <input type="file" name="uploadImage" id="uploadImage" class="form-control form-control-sm" accept="image/*" />
+                        <input type="hidden" asp-for="HinhAnh" />
+                        <p class="text-muted small mt-2 mb-0">Hỗ trợ: JPG, PNG, WEBP. Tối đa 2MB.</p>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Thiết lập trạng thái</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" asp-for="DangBan" id="chkDangBan">
+                            <label class="form-check-label fw-bold" for="chkDangBan">Đang kinh doanh</label>
+                            <p class="text-muted small mb-0">Tắt nếu bạn muốn tạm ngừng bán sản phẩm này.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-3">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> @(isEdit ? "Cập nhật sản phẩm" : "Lưu sản phẩm mới")
+                            </button>
+                            <a asp-action="Index" class="btn btn-light btn-lg">
+                                Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // 1. Preview ảnh khi chọn file
+            $('#uploadImage').change(function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = ev => $('#imagePreview').attr('src', ev.target.result);
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // 2. Xử lý tiền tệ & Giữ con trỏ
+            const $real = $('#GiaBanReal'), $display = $('#GiaBanDisplay');
+
+            const formatCurrency = (input) => {
+                let val = input.value;
+                let digitsBeforeCursor = val.slice(0, input.selectionStart).replace(/\D/g, '').length;
+                let raw = val.replace(/\D/g, '');
+                $real.val(raw);
+                let formatted = raw ? Number(raw).toLocaleString('vi-VN') : '';
+                input.value = formatted;
+
+                let newPos = 0, count = 0;
+                while (count < digitsBeforeCursor && newPos < formatted.length) {
+                    if (/\d/.test(formatted[newPos++])) count++;
+                }
+                input.setSelectionRange(newPos, newPos);
+            };
+
+            // Khởi tạo giá trị khi vào trang
+            if ($real.val()) $display.val(Number($real.val()).toLocaleString('vi-VN'));
+
+            $display.on('input', function() { formatCurrency(this); });
+        });
+    </script>
+}

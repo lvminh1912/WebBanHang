@@ -1,0 +1,100 @@
+﻿@model PaginatedList<TrangThaiDon>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 80px;" class="text-center">ID</th>
+                <th style="width: 25%;">Tên Trạng Thái</th>
+                <th style="width: 20%;">Minh họa</th>
+                <th>Mô Tả</th>
+                <th class="text-end" style="width: 140px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items.Any())
+            {
+                foreach (var item in Model.Items)
+                {
+                    // Logic màu sắc minh họa
+                    string badgeClass = item.MaTrangThai switch
+                    {
+                        1 => "bg-secondary",   // Mới
+                        2 => "bg-info",        // Đã duyệt
+                        3 => "bg-warning",     // Đang giao
+                        4 => "bg-success",     // Hoàn tất
+                        5 => "bg-danger",      // Đã hủy
+                        _ => "bg-light text-dark border" // Khác
+                    };
+
+                    <tr>
+                        <td class="text-center fw-bold text-muted">#@item.MaTrangThai</td>
+                        <td class="fw-bold text-dark">@item.TenTrangThai</td>
+                        <td>
+                            <span class="badge @badgeClass px-3 py-2 rounded-pill">
+                                @item.TenTrangThai
+                            </span>
+                        </td>
+                        <td class="text-muted small">@item.MoTa</td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.MaTrangThai" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+
+                            @if (item.MaTrangThai > 5)
+                            {
+                                <button class="btn btn-sm btn-outline-danger ms-1" onclick="confirmDelete(@item.MaTrangThai, '@item.TenTrangThai')" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-outline-secondary ms-1" disabled title="Mặc định hệ thống">
+                                    <i class="bi bi-lock-fill"></i>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="bi bi-stoplights fs-1 d-block mb-2"></i>
+                        Chưa có dữ liệu trạng thái.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <div class="d-flex justify-content-between align-items-center p-3 border-top">
+        <div class="text-muted small">
+            Trang <strong>@Model.PageIndex</strong> / <strong>@Model.TotalPages</strong>
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                    <a class="page-link" href="javascript:void(0)" onclick="loadPage(@(Model.PageIndex - 1))">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                        <a class="page-link" href="javascript:void(0)" onclick="loadPage(@i)">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                    <a class="page-link" href="javascript:void(0)" onclick="loadPage(@(Model.PageIndex + 1))">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}

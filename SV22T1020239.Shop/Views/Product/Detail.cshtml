@@ -1,0 +1,81 @@
+﻿@model MatHang
+@{
+    ViewData["Title"] = Model.TenMatHang;
+}
+
+<section class="py-5">
+    <div class="container-fluid">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="card border-0 rounded-4 shadow-sm overflow-hidden">
+                    <div class="position-relative p-4 text-center">
+                        <img src="~/images/MatHang/@(string.IsNullOrEmpty(Model.HinhAnh) ? "no-image.png" : Model.HinhAnh)"
+                             class="img-fluid" style="max-height: 500px; object-fit: contain;" alt="@Model.TenMatHang">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="product-info ps-lg-4">
+                    <h2 class="display-6 fw-bold mb-3">@Model.TenMatHang</h2>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="display-6 fw-bold text-primary me-3">@Model.GiaBan.ToString("N0") ₫</span>
+                    </div>
+
+                    <p class="text-muted mb-4">@Model.MoTa</p>
+
+                    <form action="~/Cart/Add/@Model.MaMatHang" method="get">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="input-group border rounded-3 overflow-hidden">
+                                    <button class="btn btn-light border-0" type="button" onclick="decreaseQty()">-</button>
+                                    <input type="number" name="quantity" id="quantity" class="form-control border-0 text-center bg-light" value="1" min="1">
+                                    <button class="btn btn-light border-0" type="button" onclick="increaseQty()">+</button>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <button type="submit" class="btn btn-outline-dark btn-lg py-3 px-4 text-uppercase fw-bold rounded-2">
+                                        <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ
+                                    </button>
+                                    <a href="~/Product" class="btn btn-yellow btn-lg py-3 px-4 text-uppercase fw-bold rounded-2" >
+                                        <i class="bi bi-arrow-left me-2"></i> Quay lại Shop
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="card bg-light border-0 rounded-3">
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0 text-muted">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Giao hàng miễn phí cho đơn từ 500k</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Cam kết 100% thực phẩm sạch</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i> Đổi trả trong 24h nếu không hài lòng</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Script đơn giản để tăng giảm số lượng
+        function increaseQty() {
+            var input = document.getElementById('quantity');
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseQty() {
+            var input = document.getElementById('quantity');
+            var value = parseInt(input.value);
+            if (value > 1) {
+                input.value = value - 1;
+            }
+        }
+    </script>
+}

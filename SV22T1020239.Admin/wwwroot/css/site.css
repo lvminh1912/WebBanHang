@@ -1,0 +1,225 @@
+﻿/* =========================================
+   1. CORE LAYOUT & COLORS
+   ========================================= */
+:root {
+    --bs-primary: #3b7ddd; /* Màu xanh */
+    --bs-primary-rgb: 59, 125, 221;
+    --bs-body-bg: #f5f7fb; /* Màu nền */
+    --sidebar-bg: #0a5c36; /* Màu nền Sidebar */
+    --sidebar-color: #e9ecef;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bs-body-bg);
+    font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Wrapper bao quanh toàn bộ trang */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    min-height: 100vh; /* Quan trọng: Đảm bảo chiều cao tối thiểu bằng màn hình */
+    background-color: var(--bs-body-bg);
+}
+
+/* =========================================
+   2. SIDEBAR (MENU TRÁI)
+   ========================================= */
+#sidebar {
+    min-width: 260px;
+    max-width: 260px;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-color);
+    transition: margin-left 0.35s ease-in-out, left 0.35s ease-in-out;
+    direction: ltr;
+    z-index: 100;
+    /* Sticky: Giữ cố định khi cuộn */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto; /* Cho phép cuộn riêng menu nếu quá dài */
+}
+
+    /* Thanh cuộn đẹp cho Sidebar */
+    #sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    #sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    #sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.2);
+        border-radius: 4px;
+    }
+
+    #sidebar.collapsed {
+        margin-left: -260px; /* Ẩn menu */
+    }
+
+.sidebar-brand {
+    font-weight: 600;
+    font-size: 1.35rem;
+    padding: 1.5rem;
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0.1); /* Nền logo đậm hơn chút */
+}
+
+    .sidebar-brand:hover {
+        color: #fff;
+        text-decoration: none;
+    }
+
+.sidebar-nav {
+    padding: 0;
+    list-style: none;
+    margin-bottom: 0;
+}
+
+.sidebar-header {
+    background: transparent;
+    padding: 1.5rem 1.5rem 0.375rem;
+    font-size: 0.75rem;
+    color: #ced4da;
+    opacity: 0.6;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: rgba(233, 236, 239, 0.6);
+    text-decoration: none;
+    font-weight: 400;
+    background: transparent;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+    .sidebar-link:hover {
+        color: rgba(233, 236, 239, 0.9);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar-link i {
+        margin-right: 0.75rem;
+        color: rgba(233, 236, 239, 0.6);
+    }
+
+/* Active State (Màu xanh Desher) */
+.sidebar-item.active .sidebar-link {
+    color: #fff;
+    background: linear-gradient(90deg, rgba(59, 125, 221, 0.1), rgba(59, 125, 221, 0.0875) 50%, transparent);
+    border-left-color: var(--bs-primary);
+}
+
+    .sidebar-item.active .sidebar-link i {
+        color: #fff;
+    }
+
+/* =========================================
+   3. MAIN CONTENT (NỘI DUNG CHÍNH)
+   ========================================= */
+.main {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex-direction: column;
+    background-color: var(--bs-body-bg);
+    min-height: 100vh; /* Phủ kín màn hình */
+    transition: margin-left .35s ease-in-out,left .35s ease-in-out;
+}
+
+/* Header */
+.navbar-bg {
+    background: #fff;
+    padding: 0.8rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 99; /* Nằm dưới sidebar nhưng trên nội dung */
+}
+
+/* Content Area */
+.content {
+    flex: 1; /* Đẩy footer xuống đáy */
+    padding: 2.5rem; /* Khoảng cách thoáng hơn */
+}
+
+/* Footer */
+.footer {
+    background: #fff;
+    padding: 1rem 0;
+    border-top: 1px solid #dee2e6;
+    margin-top: auto; /* Đẩy footer xuống cuối cùng */
+}
+
+/* =========================================
+   4. CUSTOM COMPONENTS & OVERRIDES
+   ========================================= */
+/* Override Button Primary để dùng màu xanh Desher */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+    .btn-primary:hover {
+        background-color: #326abc;
+        border-color: #2f64b1;
+    }
+
+/* Card Style */
+.card {
+    box-shadow: 0 0 .875rem 0 rgba(33,40,50,.05);
+    border: none;
+    margin-bottom: 24px;
+    background-color: #fff;
+    background-clip: border-box;
+    border-radius: .35rem;
+}
+
+.card-header {
+    border-bottom: 1px solid #f0f2f5;
+    background-color: #fff;
+    padding: 1rem 1.25rem;
+}
+
+.card-title {
+    color: #333;
+    font-weight: 600;
+}
+
+/* Table Style */
+.table thead th {
+    border-top: 0;
+    border-bottom-width: 1px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    #sidebar {
+        margin-left: -260px;
+    }
+
+        #sidebar.collapsed {
+            margin-left: 0;
+        }
+
+    .content {
+        padding: 1.5rem;
+    }
+}

@@ -1,0 +1,141 @@
+﻿@model PaginatedList<MatHang>
+
+@{
+    ViewData["Title"] = "Quản lý mặt hàng";
+}
+
+<div class="container-fluid p-0">
+    <div class="row mb-2 mb-xl-3">
+        <div class="col-auto d-none d-sm-block">
+            <h3 class="d-inline-block"><strong>Quản lý mặt hàng</strong></h3>
+        </div>
+        <div class="col-auto ms-auto text-end mt-n1">
+            <a asp-action="Create" class="btn btn-success shadow-sm">
+                <i class="bi bi-plus-lg"></i> Thêm sản phẩm mới
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">Bộ lọc tìm kiếm</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="get" id="searchForm">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Tên sản phẩm</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                            <input type="text" name="searchName" value="@ViewBag.SearchModel?.SearchName" class="form-control" placeholder="Nhập tên cần tìm...">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Loại hàng</label>
+                        <select name="maLoai" class="form-select">
+                            <option value="">-- Tất cả loại --</option>
+                            @foreach (var item in ViewBag.LoaiHangs)
+                            {
+                                <option value="@item.MaLoaiHang" selected="@(item.MaLoaiHang == ViewBag.SearchModel?.MaLoai)">
+                                    @item.TenLoaiHang
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Khoảng giá</label>
+                        <div class="input-group">
+                            <input type="text" name="giaMin" value="@(ViewBag.SearchModel?.GiaMin?.ToString("N0"))" class="form-control currency-input" placeholder="Từ...">
+                            <span class="input-group-text border-start-0 border-end-0 bg-white">-</span>
+                            <input type="text" name="giaMax" value="@(ViewBag.SearchModel?.GiaMax?.ToString("N0"))" class="form-control currency-input" placeholder="Đến...">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel"></i> Lọc dữ liệu
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body p-0">
+            <div id="product-container">
+                <partial name="List" model="Model" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // --- Logic AJAX giữ nguyên như cũ ---
+        window.loadPage = function(page) {
+            const getRawNumber = (selector) => {
+                let val = $(selector).val() || "";
+                return val.replace(/\./g, "");
+            };
+
+            let data = {
+                page: page,
+                searchName: $('input[name="searchName"]').val() || null,
+                maLoai: $('select[name="maLoai"]').val() || null,
+                giaMin: getRawNumber('input[name="giaMin"]') || null,
+                giaMax: getRawNumber('input[name="giaMax"]') || null
+            };
+
+            $.ajax({
+                url: '@Url.Action("Index", "MatHang")',
+                type: 'GET',
+                data: data,
+                success: function (result) {
+                    $('#product-container').html(result);
+                    // Cuộn nhẹ lên đầu danh sách
+                    $('html, body').animate({ scrollTop: $("#product-container").offset().top - 150 }, 200);
+                },
+                error: function(xhr) {
+                    console.error(xhr);
+                    alert("Lỗi tải dữ liệu.");
+                }
+            });
+        }
+
+        window.confirmDelete = function(id, name) {
+            if (confirm(`Xóa sản phẩm "${name}"? Hành động này không thể hoàn tác.`)) {
+                $.ajax({
+                    url: '@Url.Action("Delete", "MatHang")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        if (response.success) {
+                            // Load lại trang hiện tại
+                            let currentPage = parseInt($('.pagination .active .page-link').text()) || 1;
+                            loadPage(currentPage);
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () { alert("Lỗi kết nối server."); }
+                });
+            }
+        }
+
+        $(document).ready(function () {
+            $('#searchForm').submit(function (e) {
+                e.preventDefault();
+                loadPage(1);
+            });
+
+            // Format tiền tệ khi nhập
+            $(document).on('input', '.currency-input', function () {
+                let value = $(this).val().replace(/\D/g, "");
+                $(this).val(value ? new Intl.NumberFormat('vi-VN').format(value) : "");
+            });
+        });
+    </script>
+}

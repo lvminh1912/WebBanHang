@@ -1,0 +1,250 @@
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Tổng quan</h2>
+            <p class="text-muted mb-0">Chào mừng trở lại, đây là tình hình kinh doanh hôm nay.</p>
+        </div>
+        <div>
+            <button class="btn btn-primary shadow-sm">
+                <i class="bi bi-download"></i> Xuất báo cáo
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">
+                            <i class="bi bi-currency-dollar fs-3"></i>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success">+12% tuần này</span>
+                    </div>
+                    <h6 class="text-muted text-uppercase fw-bold small">Tổng Doanh Thu</h6>
+                    <h3 class="fw-bold mb-0">@Model.DoanhThu.ToString("N0") ₫</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 text-primary">
+                            <i class="bi bi-bag-check fs-3"></i>
+                        </div>
+                    </div>
+                    <h6 class="text-muted text-uppercase fw-bold small">Tổng Đơn Hàng</h6>
+                    <h3 class="fw-bold mb-0">@Model.TongDonHang</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="bg-info bg-opacity-10 p-3 rounded-3 text-info">
+                            <i class="bi bi-people fs-3"></i>
+                        </div>
+                    </div>
+                    <h6 class="text-muted text-uppercase fw-bold small">Khách Hàng</h6>
+                    <h3 class="fw-bold mb-0">@Model.TongKhachHang</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-3 text-warning">
+                            <i class="bi bi-box-seam fs-3"></i>
+                        </div>
+                    </div>
+                    <h6 class="text-muted text-uppercase fw-bold small">Sản Phẩm</h6>
+                    <h3 class="fw-bold mb-0">@Model.TongSanPham</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Biểu đồ doanh thu năm nay</h5>
+                    <select class="form-select form-select-sm w-auto">
+                        <option>2025</option>
+                        <option>2024</option>
+                    </select>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">Trạng thái đơn hàng</h5>
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    <canvas id="statusChart" style="max-height: 250px;"></canvas>
+                </div>
+                <div class="card-footer bg-white border-0">
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span><i class="bi bi-circle-fill text-success"></i> Hoàn thành</span>
+                        <span><i class="bi bi-circle-fill text-warning"></i> Chờ xử lý</span>
+                        <span><i class="bi bi-circle-fill text-danger"></i> Đã hủy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="mb-0 fw-bold">Đơn hàng mới nhất</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Mã Đơn</th>
+                        <th>Khách Hàng</th>
+                        <th>Ngày Đặt</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th class="text-end pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.DonHangMoiNhat != null && Model.DonHangMoiNhat.Any())
+                    {
+                        foreach (var item in Model.DonHangMoiNhat)
+                        {
+                            // Áp dụng logic switch từ TrangThaiDon dựa trên MaTrangThai của đơn hàng
+                            string badgeClass = item.MaTrangThai switch
+                            {
+                                1 => "bg-secondary",   // Mới
+                                2 => "bg-info",        // Đã duyệt
+                                3 => "bg-warning",     // Đang giao
+                                4 => "bg-success",     // Hoàn tất
+                                5 => "bg-danger",      // Đã hủy
+                                _ => "bg-light text-dark border" // Trạng thái khác
+                            };
+
+                            <tr>
+                                <td class="ps-4 fw-bold">#@item.MaDonHang</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2">
+                                            @if (!string.IsNullOrEmpty(item.KhachHang?.HinhAnh))
+                                            {
+                                                <img src="~/images/KhachHang/@item.KhachHang.HinhAnh"
+                                                     alt="@item.KhachHang.HoTen"
+                                                     class="rounded-circle object-fit-cover border"
+                                                     style="width: 40px; height: 40px;"
+                                                     onerror="this.src='/images/no-image.png'" />
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border text-primary fw-bold"
+                                                     style="width: 40px; height: 40px;">
+                                                    @(item.KhachHang?.HoTen?.Substring(0, 1) ?? "?")
+                                                </div>
+                                            }
+                                        </div>
+
+                                        <div>
+                                            <div class="fw-bold text-dark">@item.KhachHang?.HoTen</div>
+                                            <div class="small text-muted">@item.KhachHang?.DienThoai</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@item.NgayDat?.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="fw-bold">@item.TongTien?.ToString("N0") ₫</td>
+                                <td>
+                                    @* Sử dụng badgeClass vừa tính toán và style bo tròn từ mẫu bạn cung cấp *@
+                                    <span class="badge @badgeClass px-3 py-2 rounded-pill">
+                                        @item.TrangThaiDon?.TenTrangThai
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="/DonHang/Details/@item.MaDonHang" class="btn btn-sm btn-light">
+                                        Chi tiết <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">Chưa có đơn hàng nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // 1. Cấu hình Biểu đồ Doanh Thu (Line Chart)
+        const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctxRevenue, {
+            type: 'line',
+            data: {
+                labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'], // Dữ liệu giả lập
+                datasets: [{
+                    label: 'Doanh thu (Triệu VNĐ)',
+                    data: [12, 19, 3, 5, 2, 30], // Dữ liệu giả lập, bạn có thể truyền từ Controller sang nếu muốn
+                    borderColor: '#0d6efd', // Màu xanh Primary
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    tension: 0.4, // Độ cong của đường
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [2, 2] } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Cấu hình Biểu đồ Trạng Thái (Doughnut Chart)
+        const ctxStatus = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: ['Hoàn thành', 'Chờ xử lý', 'Đã hủy'],
+                datasets: [{
+                    data: [300, 50, 100], // Dữ liệu giả lập
+                    backgroundColor: ['#198754', '#ffc107', '#dc3545'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '75%', // Độ dày vòng tròn
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+}

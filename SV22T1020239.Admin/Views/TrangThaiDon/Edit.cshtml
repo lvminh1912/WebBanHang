@@ -1,0 +1,82 @@
+﻿@model TrangThaiDon
+@{
+    // Nếu TenTrangThai có dữ liệu => Đang sửa
+    bool isEdit = !string.IsNullOrEmpty(Model.TenTrangThai);
+    ViewData["Title"] = isEdit ? "Cập nhật trạng thái" : "Thêm trạng thái mới";
+}
+
+<div class="container-fluid p-0">
+    <div class="mb-3">
+        <h3 class="d-inline-block"><strong>@(isEdit ? "Cập nhật" : "Thêm mới")</strong> Trạng thái đơn</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Danh sách</a></li>
+                <li class="breadcrumb-item active">@ViewData["Title"]</li>
+            </ol>
+        </nav>
+    </div>
+
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="card-title mb-0">Thông tin chi tiết</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="MaTrangThai" class="form-label fw-bold">Mã số (ID) <span class="text-danger">*</span></label>
+                            @if (isEdit)
+                            {
+                                <input asp-for="MaTrangThai" class="form-control bg-light" readonly />
+                                <div class="form-text">Mã số không thể thay đổi sau khi tạo.</div>
+                            }
+                            else
+                            {
+                                <input asp-for="MaTrangThai" class="form-control" type="number" placeholder="Nhập mã số (VD: 6, 7...)" required />
+                                <div class="form-text text-danger">Lưu ý: Không nhập trùng với mã đã có (1-5 là hệ thống).</div>
+                            }
+                            <span asp-validation-for="MaTrangThai" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TenTrangThai" class="form-label fw-bold">Tên trạng thái <span class="text-danger">*</span></label>
+                            <input asp-for="TenTrangThai" class="form-control form-control-lg" placeholder="VD: Đang đóng gói..." />
+                            <span asp-validation-for="TenTrangThai" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="MoTa" class="form-label fw-bold">Mô tả thêm</label>
+                            <textarea asp-for="MoTa" class="form-control" rows="4" placeholder="Nhập ghi chú về trạng thái này..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> @(isEdit ? "Lưu thay đổi" : "Tạo mới")
+                            </button>
+                            <a asp-action="Index" class="btn btn-light btn-lg">Quay lại danh sách</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 mt-3 bg-light">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-info-circle-fill text-info"></i> Hướng dẫn</h6>
+                        <ul class="small text-muted mb-0 ps-3">
+                            <li><strong>ID 1-5:</strong> Thường được hệ thống sử dụng mặc định, hạn chế chỉnh sửa ý nghĩa của chúng.</li>
+                            <li><strong>Màu sắc:</strong> Hệ thống sẽ tự động gán màu sắc dựa trên ID để hiển thị trực quan.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

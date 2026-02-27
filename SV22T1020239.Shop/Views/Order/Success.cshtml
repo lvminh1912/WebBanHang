@@ -1,0 +1,16 @@
+﻿@model int
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+}
+
+<div class="text-center py-5">
+    <div class="display-1 text-success mb-3"><i class="fa fa-check-circle"></i></div>
+    <h1 class="text-success">Đặt hàng thành công!</h1>
+    <p class="lead">Mã đơn hàng của bạn là: <strong>#@Model</strong></p>
+    <p>Chúng tôi sẽ sớm liên hệ để giao hàng cho bạn.</p>
+
+    <div class="mt-4">
+        <a href="/" class="btn btn-outline-primary">Tiếp tục mua sắm</a>
+        <a href="~/User/Orders" class="btn btn-primary">Xem lịch sử đơn hàng</a>
+    </div>
+</div>
